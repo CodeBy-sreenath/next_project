@@ -1,9 +1,10 @@
 'use client'
 import { assets } from '@/Assets/assets'
 import Image from 'next/image'
-import React from 'react'
+import React, { useState } from 'react'
 
 const page = () => {
+    const[image,setImage]=useState(null)
   return (
     <div>
         <form className='pt-5 px-5 sm:pt-12 sm:pl-16'>
