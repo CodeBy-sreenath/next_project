@@ -1,5 +1,6 @@
 'use client'
 import { assets } from '@/Assets/assets'
+import { set } from 'mongoose'
 import Image from 'next/image'
 import React, { useState } from 'react'
 
@@ -13,7 +14,7 @@ const page = () => {
             <Image className='mt-4 cursor-pointer' src={assets.upload_area} alt='' width={140} height={70}  />
             </label>
             
-            <input type='file' id='image' hidden required />
+            <input onChange={(e)=>setImage(e.target.files[0])} type='file' id='image' hidden required />
 
 
         </form>
