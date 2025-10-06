@@ -31,7 +31,7 @@ const page = () => {
             <p className='text-xl mt-4'>Blog Title</p>
             <input name='title' onChange={onChangeHandler} value={data.title} className='w-full sm:w-[500px] mt-4 px-4 py-3 border outline-none' type='text' placeholder='Type here ' required />
             <p className='text-xl mt-4'>Blog Description</p>
-            <textarea className='w-full sm:w-[500px] mt-4 px-4 py-3 border outline-none' type='text' placeholder='write content ' rows={6} required />
+            <textarea name='description' onChange={onChangeHandler} className='w-full sm:w-[500px] mt-4 px-4 py-3 border outline-none' type='text' placeholder='write content ' rows={6} required />
             <p className='text-xl mt-4'> Blog Category</p>
             <select name='category' className='mt-3 w-40 px-4 py-3 border text-gray-500'>
                 <option value='Startup'>StartUp</option>
