@@ -17,6 +17,7 @@ const page = () => {
         const name=event.target.name
         const value=event.target.value
         setData(data=>({...data,[name]:value}))
+        console.log(data)
     }
   return (
     <div>
@@ -28,7 +29,7 @@ const page = () => {
             
             <input onChange={(e)=>setImage(e.target.files[0])} type='file' id='image' hidden required />
             <p className='text-xl mt-4'>Blog Title</p>
-            <input className='w-full sm:w-[500px] mt-4 px-4 py-3 border outline-none' type='text' placeholder='Type here ' required />
+            <input name='title' onChange={onChangeHandler} value={data.title} className='w-full sm:w-[500px] mt-4 px-4 py-3 border outline-none' type='text' placeholder='Type here ' required />
             <p className='text-xl mt-4'>Blog Description</p>
             <textarea className='w-full sm:w-[500px] mt-4 px-4 py-3 border outline-none' type='text' placeholder='write content ' rows={6} required />
             <p className='text-xl mt-4'> Blog Category</p>
