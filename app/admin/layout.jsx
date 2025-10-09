@@ -3,12 +3,14 @@
 import { assets } from "@/Assets/assets"
 import SideBar from "@/Components/AdminComponents/SideBar"
 import Image from "next/image"
+import { ToastContainer} from 'react-toastify';
 
 export default function layOut({children})
 {
     return(
         <>
         <div className="flex">
+            <ToastContainer theme="dark" />
             <SideBar />
         
         <div className="flex flex-col w-full">
