@@ -1,36 +1,76 @@
 'use client'
-import { assets, blog_data } from '@/Assets/assets'
+import { assets } from '@/Assets/assets'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import Footer from '@/Components/Footer'
+import axios from 'axios'
 
 const BlogPage = () => {
-  const { id } = useParams()
+  const params = useParams()
   const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  const fetchBlogData = async () => {
+    try {
+      const response = await axios.get('/api/blog', {
+        params: { id: params.id },
+      })
+      setData(response.data.blog)
+    } catch (error) {
+      console.error('❌ Error fetching blog:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    if (!id) return
-    const blog = blog_data.find((item) => item.id === Number(id))
-    if (blog) setData(blog)
-  }, [id])
+    fetchBlogData()
+  }, [params.id])
 
-  if (!data) return <p className="text-center mt-10">Loading...</p>
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-gray-500 text-lg">Loading blog...</p>
+      </div>
+    )
+  }
+
+  if (!data) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-gray-500 text-lg">Blog not found.</p>
+      </div>
+    )
+  }
+
+  // ✅ Handle image properly (remote or local)
+  const imageSrc =
+    data.image && data.image.trim() !== ''
+      ? data.image
+      : '/fallback-blog.jpg' // Make sure this file exists in /public
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Main content */}
       <main className="flex-1 max-w-3xl mx-auto p-6 w-full">
         {/* Blog image */}
-        <div className="w-full h-[300px] relative mb-6">
-          <Image
-            src={data.image}
-            alt={data.title}
-            fill
-            className="object-cover rounded-lg"
-          />
-        </div>
+        {imageSrc ? (
+          <div className="w-full h-[300px] relative mb-6">
+            <Image
+              src={imageSrc}
+              alt={data.title || 'Blog image'}
+              fill
+              className="object-cover rounded-lg"
+              priority
+              unoptimized // allows remote URLs without domain config
+            />
+          </div>
+        ) : (
+          <div className="w-full h-[300px] bg-gray-200 rounded-lg mb-6 flex items-center justify-center">
+            <p className="text-gray-500">No image available</p>
+          </div>
+        )}
 
         {/* Category */}
         <p className="text-sm bg-black text-white inline-block px-3 py-1 rounded mb-3">
@@ -49,6 +89,7 @@ const BlogPage = () => {
                 alt={data.author || 'Author'}
                 fill
                 className="object-cover rounded-full"
+                unoptimized
               />
             ) : (
               <div className="w-full h-full bg-gray-300 rounded-full flex items-center justify-center">
@@ -92,21 +133,23 @@ const BlogPage = () => {
         {/* Steps section */}
         <div className="mb-6">
           <h3 className="my-5 text-[18px] font-semibold">Step 1: Self Reflection</h3>
-          <p className="my-3">You can change your life with proper plan</p>
+          <p className="my-3">You can change your life with a proper plan</p>
 
-          <h3 className="my-5 text-[18px] font-semibold">Step 2: Self Reflection</h3>
-          <p className="my-3">You can change your life with proper plan</p>
+          <h3 className="my-5 text-[18px] font-semibold">Step 2: Action Plan</h3>
+          <p className="my-3">Stay consistent and evaluate your progress regularly</p>
         </div>
 
         {/* Social share */}
         <div className="flex items-center gap-2 mb-6">
-          <p className="text-black font-semibold my-4">Share This Article On Social Media</p>
-          <Image src={assets.facebook_icon} alt="Facebook" width={50} />
-          <Image src={assets.twitter_icon} alt="Twitter" width={50} />
-          <Image src={assets.googleplus_icon} alt="Google Plus" width={50} />
+          <p className="text-black font-semibold my-4">
+            Share This Article On Social Media
+          </p>
+          <Image src={assets.facebook_icon} alt="Facebook" width={40} />
+          <Image src={assets.twitter_icon} alt="Twitter" width={40} />
+          <Image src={assets.googleplus_icon} alt="Google Plus" width={40} />
         </div>
 
-        {/* Additional HTML content */}
+        {/* Extra content */}
         {data.content && (
           <div className="mt-8 prose prose-lg max-w-none">
             <div dangerouslySetInnerHTML={{ __html: data.content }} />
@@ -114,7 +157,6 @@ const BlogPage = () => {
         )}
       </main>
 
-      {/* Footer - full width */}
       <footer className="w-full">
         <Footer />
       </footer>
@@ -122,4 +164,4 @@ const BlogPage = () => {
   )
 }
 
-export default BlogPage 
+export default BlogPage

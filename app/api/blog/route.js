@@ -2,6 +2,7 @@ import { connectDb } from "@/app/blogs/[id]/lib/config/db"
 import BlogModel from "@/app/blogs/[id]/lib/models/BlogModel"
 import { writeFile } from "fs/promises"
 import { NextResponse } from "next/server"
+const fs=require('fs')
 
 // ✅ Fix: Actually call the function
 const LoadDbB = async () => {
@@ -11,9 +12,21 @@ LoadDbB()
 
 // ✅ GET route
 export async function GET(request) {
+  const blogId=request.nextUrl.searchParams.get("id") //id get from the front end
+  if(blogId)
+  {
+    const blog=await BlogModel.findById(blogId)
+    return NextResponse.json({blog})
+  }
+  else
+  {
+    
     const blogs=await BlogModel.find({})
   console.log("Blog Get Hit")
   return NextResponse.json({ blogs })
+
+  }
+
 }
 
 //API end point for uploading blog data
@@ -36,7 +49,8 @@ export async function POST(request) {
 
     await writeFile(path, buffer) // save image to /public folder
 
-    const imgUrl = `${timeStamp}_${image.name}`
+    //const imgUrl = `${timeStamp}_${image.name}`
+    const imgUrl = `/${timeStamp}_${image.name}`
     const blogData = {
       title: formData.get("title"),
       description: formData.get("description"),
@@ -54,5 +68,49 @@ export async function POST(request) {
   } catch (error) {
     console.error("Error saving blog:", error)
     return NextResponse.json({ success: false, msg: "Internal Server Error", error: error.message }, { status: 500 })
+  }
+}
+//APi end point for deleting the blog
+export async function DELETE(request) {
+  try {
+    await connectDb();
+    const id = request.nextUrl.searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, msg: "Missing blog ID" },
+        { status: 400 }
+      );
+    }
+
+    const blog = await BlogModel.findById(id);
+    if (!blog) {
+      return NextResponse.json(
+        { success: false, msg: "Blog not found" },
+        { status: 404 }
+      );
+    }
+
+    // Delete image file if it exists
+    const imagePath = `./public${blog.image}`;
+    if (fs.existsSync(imagePath)) {
+      fs.unlink(imagePath, (err) => {
+        if (err) console.error("Error deleting image:", err);
+        else console.log("🗑️ Image deleted:", imagePath);
+      });
+    }
+
+    await BlogModel.findByIdAndDelete(id);
+
+    return NextResponse.json({
+      success: true,
+      msg: "Blog deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting blog:", error);
+    return NextResponse.json(
+      { success: false, msg: "Internal Server Error", error: error.message },
+      { status: 500 }
+    );
   }
 }
